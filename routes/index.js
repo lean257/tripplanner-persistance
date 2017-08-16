@@ -19,5 +19,17 @@ router.get('/', function(req, res, next) {
   })
   .catch(next);
 });
-
+router.get('/api/options', (req, res, next) => {
+  Promise.all([
+    Hotel.findAll(),
+    Restaurant.findAll(),
+    Activity.findAll()
+  ])
+  .then(response => {
+    //response[0] is hotel
+    console.log(response[0])
+    res.send(response)
+  })
+  .catch(next)
+})
 module.exports = router;
