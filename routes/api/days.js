@@ -28,7 +28,9 @@ router.delete('/api/days/:id', (req, res, next) => {
       id: req.params.id
     }
   })
-  .then(day => res.send(day))
+  .then(() => {
+    res.sendStatus(204);
+  })
 })
 //create a new day
 router.post('/api/days', (req, res, next) => {
@@ -42,15 +44,18 @@ router.put('/api/days/:id/restaurants', (req, res, next) => {
   //find the day that I'm updating, then addRestaurant
   Day.findOne({where: {id: req.params.id}})
   .then(currDay => {
-    return currDay.update(req.body)
+    //addRestaurant just takes an ID that we pass in from ajax request
+    return currDay.addRestaurant(req.body.restaurantId)
   })
-  .then(restaurant => res.send(restaurant))
+  .then(restaurant => {
+    res.send(restaurant)
+  })
 })
 //remove restaurants from specific day
 router.delete('/api/days/:id/restaurants', (req, res, next) => {
   Day.findOne({where: {id: req.params.id}})
   .then(currDay => {
-    currDay.removeRestaurant(req.body)
+    return currDay.removeRestaurant(req.body.restaurantId)
   })
   .then(restaurant => {
       res.send(restaurant)
@@ -61,7 +66,7 @@ router.put('/api/days/:id/activities', (req, res, next) => {
   //find the day that I'm updating, then addRestaurant
   Day.findOne({where: {id: req.params.id}})
   .then(currDay => {
-    currDay.update(req.body)
+    return currDay.addActivity(req.body.activityId)
   })
   .then(activity => res.send(activity))
 })
@@ -69,13 +74,12 @@ router.put('/api/days/:id/activities', (req, res, next) => {
 router.delete('/api/days/:id/activities', (req, res, next) => {
   Day.findOne({where: {id: req.params.id}})
   .then(currDay => {
-    currDay.removeActivity(req.body)
+    currDay.removeActivity(req.body.activityId)
   })
   .then(activity => res.send(activity))
 })
 //add hotel: use setHotel
 router.put('/api/days/:id/hotels', (req, res, next) => {
-  console.log('we are in this hotel route')
   Day.findOne({where: {id: req.params.id}})
   .then(currDay => {
     return currDay.update(req.body)

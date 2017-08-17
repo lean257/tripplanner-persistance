@@ -79,16 +79,22 @@ var tripModule = (function () {
   function deleteCurrentDay() {
     // prevent deleting last day
     if (days.length < 2 || !currentDay) return;
-    // remove from the collection
-    var index = days.indexOf(currentDay),
+    $.ajax({
+        method: 'DELETE',
+        url: `/api/days/${currentDay.id}`
+    })
+    .then(() => {
+      var index = days.indexOf(currentDay),
       previousDay = days.splice(index, 1)[0],
       newCurrent = days[index] || days[index - 1];
-    // fix the remaining day numbers
-    days.forEach(function (day, i) {
-      day.setNumber(i + 1);
-    });
-    switchTo(newCurrent);
-    previousDay.hideButton();
+      // fix the remaining day numbers
+      days.forEach(function (day, i) {
+        day.setNumber(i + 1);
+      });
+      switchTo(newCurrent);
+      previousDay.hideButton();
+    })
+    // remove from the collection
   }
 
   // globally accessible module methods
@@ -100,22 +106,7 @@ var tripModule = (function () {
       // ~~~~~~~~~~~~~~~~~~~~~~~
       //If we are trying to load existing Days, then let's make a request to the server for the day. Remember this is async. For each day we get back what do we need to do to it?
       // ~~~~~~~~~~~~~~~~~~~~~~~
-      // $.ajax({
-      //   method: 'GET',
-      //   url: '/api/days'
-      // })
-      //   .then(function (data) { console.log('GET response data: ', data) })
-      //   .catch(console.error.bind(console));
-      // // should log "GET response data: You GOT all the days"
-      // $.ajax({
-      //   method: 'POST',
-      //   url: '/api/days'
-      // })
-      //   .then(function (data) { console.log('POST response data: ', data) })
-      //   .catch(console.error.bind(console));
-
-
-      // should log "POST response data: You created a day!!"
+      //get all the days
       $.ajax({
         method: 'GET',
         url: '/api/days'

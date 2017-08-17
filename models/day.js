@@ -10,6 +10,22 @@ var Day = db.define('day', {
     type: Sequelize.INTEGER,
     allowNull: false
   }
+}, {
+  hooks: {
+    beforeDestroy: (day, options) => {
+      Day.findAll({
+        where: {
+          number: {
+            $gt: day.number
+          }
+        }
+      })
+      .then(remainingDays => {
+        console.log('are you getting in remainingDays?')
+        remainingDays.forEach(eachDay => eachDay.number--)
+      })
+    }
+  }
 })
 
 // Day.belongsTo(Hotel)

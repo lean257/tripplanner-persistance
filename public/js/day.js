@@ -97,9 +97,9 @@ var dayModule = (function () {
     // Do not add an attraction to the page until you have added it to the DB.
     // es6 template literals might be helpful for the url route path for your AJAX request
   // ~~~~~~~~~~~~~~~~~~~~~~~
+  var addItemsToDay;
   Day.prototype.addAttraction = function (attraction) {
     // adding to the day object
-    var addItemsToDay;
     switch (attraction.type) {
       case 'hotel':
         if (this.hotel) this.hotel.hide();
@@ -156,12 +156,33 @@ var dayModule = (function () {
     switch (attraction.type) {
       case 'hotel':
         this.hotel = null;
+        addItemsToDay = $.ajax({
+          method: 'DELETE',
+          url: `api/days/${this.id}/hotels`,
+          data: {
+            hotelId: attraction.id
+          }
+        });
         break;
       case 'restaurant':
         utilsModule.remove(this.restaurants, attraction);
+        addItemsToDay = $.ajax({
+          method: 'DELETE',
+          url: `api/days/${this.id}/restaurants`,
+          data: {
+            restaurantId: attraction.id
+          }
+        });
         break;
       case 'activity':
         utilsModule.remove(this.activities, attraction);
+        addItemsToDay = $.ajax({
+          method: 'DELETE',
+          url: `api/days/${this.id}/activities`,
+          data: {
+            activityId: attraction.id
+          }
+        });
         break;
       default: console.error('bad type:', attraction);
     }
