@@ -25,7 +25,7 @@ var dayModule = (function () {
 
   // ~~~~~~~~~~~~~~~~~~~~~~~
     // If you follow the logic of `attractionsModule.getEnhanced` (try following it!), you will note that it depends on `loadEnhanceAttractions` to have run.
-    //Note that `loadEnhancedAttractions` is already being called for you in `/public/js/options.js` and that it utilizes another method given to us by the `attractionModule` (singular). 
+    //Note that `loadEnhancedAttractions` is already being called for you in `/public/js/options.js` and that it utilizes another method given to us by the `attractionModule` (singular).
   // ~~~~~~~~~~~~~~~~~~~~~~~
   function Day (data) {
     // for brand-new days
@@ -99,10 +99,20 @@ var dayModule = (function () {
   // ~~~~~~~~~~~~~~~~~~~~~~~
   Day.prototype.addAttraction = function (attraction) {
     // adding to the day object
+    var addItemsToDay;
     switch (attraction.type) {
       case 'hotel':
         if (this.hotel) this.hotel.hide();
         this.hotel = attraction;
+        //return the hotel added from DB?
+        //this is a promise
+        addItemsToDay = $.ajax({
+          method: 'PUT',
+          url: `api/days/${this.id}/hotel`,
+          data: {
+            hotelId: attraction.id
+          }
+        });
         break;
       case 'restaurant':
         utilsModule.pushUnique(this.restaurants, attraction);
@@ -113,7 +123,13 @@ var dayModule = (function () {
       default: console.error('bad type:', attraction);
     }
     // activating UI
-    attraction.show();
+    //showing the attractions per day from the promise
+    addItemsToDay
+    .then(() => {
+      //show method in attraction.js
+      attraction.show();
+    })
+    .catch(console.error)
   };
 
 

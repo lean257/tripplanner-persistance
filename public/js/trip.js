@@ -42,7 +42,17 @@ var tripModule = (function () {
     // before calling `addDay` or `deleteCurrentDay` that update the frontend (the UI), we need to make sure that it happened successfully on the server
   // ~~~~~~~~~~~~~~~~~~~~~~~
   $(function () {
-    $addButton.on('click', addDay);
+    $addButton.on('click', () => {
+      $.ajax({
+        method: 'POST',
+        url: '/api/days',
+        data: {
+          number: days.length + 1
+        }
+      })
+      .then(newDay => addDay(newDay))
+      .catch(console.error)
+    });
     $removeButton.on('click', deleteCurrentDay);
   });
 
@@ -51,9 +61,10 @@ var tripModule = (function () {
   // ~~~~~~~~~~~~~~~~~~~~~~~
     // `addDay` may need to take information now that we can persist days -- we want to display what is being sent from the DB
   // ~~~~~~~~~~~~~~~~~~~~~~~
-  function addDay () { 
+  function addDay (dayItems) {
     if (this && this.blur) this.blur(); // removes focus box from buttons
-    var newDay = dayModule.create({ number: days.length + 1 }); // dayModule
+    //call dayModule from day.js
+    var newDay = dayModule.create(dayItems); // dayModule
     days.push(newDay);
     if (days.length === 1) {
       currentDay = newDay;
@@ -88,7 +99,16 @@ var tripModule = (function () {
       // ~~~~~~~~~~~~~~~~~~~~~~~
         //If we are trying to load existing Days, then let's make a request to the server for the day. Remember this is async. For each day we get back what do we need to do to it?
       // ~~~~~~~~~~~~~~~~~~~~~~~
-      $(addDay);
+      $.ajax({
+        method: 'GET',
+        url: '/api/days'
+      })
+      .then(newDay => {
+        newDay.forEach(addDay)
+        switchTo(days[0])
+      })
+      .catch(console.error.bind(console));
+      // $(addDay);
     },
 
     switchTo: switchTo,
