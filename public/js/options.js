@@ -23,7 +23,7 @@ $(function () {
 
   $.ajax({
     method: 'GET',
-    url: '/api/options'
+    url: '/options'
   })
   .then(response => {
     // Once you've made AJAX calls to retrieve this information,

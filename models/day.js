@@ -13,7 +13,7 @@ var Day = db.define('day', {
 }, {
   hooks: {
     beforeDestroy: (day, options) => {
-      Day.findAll({
+      return Day.findAll({
         where: {
           number: {
             $gt: day.number
@@ -21,15 +21,15 @@ var Day = db.define('day', {
         }
       })
       .then(remainingDays => {
-        console.log('are you getting in remainingDays?')
-        remainingDays.forEach(eachDay => eachDay.number--)
+        var updatingDayNumbers = remainingDays.map(day => {
+          day.number--
+          return day.save()
+        })
+        //why do I need to return promise for updatingDayNumbers?
+        return Promise.all(updatingDayNumbers)
       })
     }
   }
 })
-
-// Day.belongsTo(Hotel)
-// Day.belongsToMany(Restaurant, {through: 'day_restaurant'});
-// Day.belongsToMany(Activity, {through: 'day_activity'});
 
 module.exports = Day;

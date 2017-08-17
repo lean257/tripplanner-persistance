@@ -5,21 +5,9 @@ var Restaurant = require('../models').Restaurant;
 var Activity = require('../models').Activity;
 
 router.get('/', function(req, res, next) {
-  Promise.all([
-    Hotel.findAll(),
-    Restaurant.findAll(),
-    Activity.findAll()
-  ])
-  .spread(function(dbHotels, dbRestaurants, dbActivities) {
-    res.render('index', {
-      templateHotels: dbHotels,
-      templateRestaurants: dbRestaurants,
-      templateActivities: dbActivities
-    });
-  })
-  .catch(next);
+  res.render('index')
 });
-router.get('/api/options', (req, res, next) => {
+router.get('/options', (req, res, next) => {
   Promise.all([
     Hotel.findAll(),
     Restaurant.findAll(),
@@ -31,4 +19,6 @@ router.get('/api/options', (req, res, next) => {
   })
   .catch(next)
 })
+//so I don't have to write in api/days everytime
+router.use('/api/days', require('./api/days'));
 module.exports = router;

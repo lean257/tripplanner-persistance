@@ -5,9 +5,10 @@ var Restaurant = require('../../models').Restaurant;
 var Activity = require('../../models').Activity;
 var Day = require('../../models').Day;
 
-//get all days
-router.get('/api/days', (req, res, next) => {
+//get all days /api/days
+router.get('/', (req, res, next) => {
   Day.findAll({
+    //include works like join
     include: [Hotel, Restaurant, Activity],
     order: 'number ASC'
   })
@@ -15,86 +16,70 @@ router.get('/api/days', (req, res, next) => {
   .catch(next)
 })
 
-//get one day
-router.get('/api/days/:id', (req, res, next) => {
-  Day.findById(req.params.id)
-  .then(day => res.send(day))
-  .catch(next)
-})
-//delete one specific day
-router.delete('/api/days/:id', (req, res, next) => {
-  Day.destroy({
-    where: {
-      id: req.params.id
-    }
-  })
-  .then(() => {
-    res.sendStatus(204);
-  })
-})
 //create a new day
-router.post('/api/days', (req, res, next) => {
+router.post('/', (req, res, next) => {
   Day.create(req.body)
   .then(day => {
     res.send(day)
   })
 })
+//use req.param to set req.day for all the findById
+router.param('id', (req,res, next, id) => {
+  Day.findById(id)
+  .then(foundDay => {
+    //are we assigning new prop for req? how can we access it outside of this function?
+    req.day = foundDay
+    next();
+    return null;
+  })
+  .catch(next)
+})
+
+//delete one specific day
+router.delete('/:id', (req, res, next) => {
+  req.day.destroy()
+  .then(() => {
+    res.sendStatus(204)
+  })
+  .catch(next)
+})
 //add restaurants to specific day
-router.put('/api/days/:id/restaurants', (req, res, next) => {
+router.put('/:id/restaurants', (req, res, next) => {
   //find the day that I'm updating, then addRestaurant
-  Day.findOne({where: {id: req.params.id}})
-  .then(currDay => {
-    //addRestaurant just takes an ID that we pass in from ajax request
-    return currDay.addRestaurant(req.body.restaurantId)
-  })
-  .then(restaurant => {
-    res.send(restaurant)
-  })
+  //addRestaurant just takes an ID that we pass in from ajax request
+  req.day.addRestaurant(req.body.restaurantId)
+  .then(() => res.sendStatus(204))
+  .catch(next)
 })
 //remove restaurants from specific day
-router.delete('/api/days/:id/restaurants', (req, res, next) => {
-  Day.findOne({where: {id: req.params.id}})
-  .then(currDay => {
-    return currDay.removeRestaurant(req.body.restaurantId)
-  })
-  .then(restaurant => {
-      res.send(restaurant)
-    })
+router.delete('/:id/restaurants', (req, res, next) => {
+  req.day.removeRestaurant(req.body.restaurantId)
+  .then(() => res.sendStatus(204))
+  .catch(next)
 })
 //add activities to specific day
-router.put('/api/days/:id/activities', (req, res, next) => {
-  //find the day that I'm updating, then addRestaurant
-  Day.findOne({where: {id: req.params.id}})
-  .then(currDay => {
-    return currDay.addActivity(req.body.activityId)
-  })
-  .then(activity => res.send(activity))
+router.put('/:id/activities', (req, res, next) => {
+  req.day.addActivity(req.body.activityId)
+  .then(() => res.sendStatus(204))
+  .catch(next)
 })
 //remove activities from specific day
-router.delete('/api/days/:id/activities', (req, res, next) => {
-  Day.findOne({where: {id: req.params.id}})
-  .then(currDay => {
-    currDay.removeActivity(req.body.activityId)
-  })
-  .then(activity => res.send(activity))
+router.delete('/:id/activities', (req, res, next) => {
+  req.day.removeActivity(req.body.activityId)
+  .then(() => res.sendStatus(204))
+  .catch(next)
 })
 //add hotel: use setHotel
-router.put('/api/days/:id/hotels', (req, res, next) => {
-  Day.findOne({where: {id: req.params.id}})
-  .then(currDay => {
-    return currDay.update(req.body)
-  })
-  .then(hotel => {
-    res.send(hotel)
-  })
+router.put('/:id/hotels', (req, res, next) => {
+  req.day.setHotel(req.body.hotelId)
+  .then(() => res.sendStatus(204))
+  .catch(next)
 })
 //remove hotel
-router.delete('/api/days/:id/hotels', (req, res, next) => {
-  Day.findOne({where: {id: req.params.id}})
-  .then(currDay => {
-    currDay.setHotel(null)
-  })
-  .then(hotel => res.send(hotel))
+router.delete('/:id/hotels', (req, res, next) => {
+  req.day.setHotel(null)
+  .then(() => res.sendStatus(204))
+  .catch(next)
 })
 
 module.exports = router;

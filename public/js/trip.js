@@ -106,7 +106,7 @@ var tripModule = (function () {
       // ~~~~~~~~~~~~~~~~~~~~~~~
       //If we are trying to load existing Days, then let's make a request to the server for the day. Remember this is async. For each day we get back what do we need to do to it?
       // ~~~~~~~~~~~~~~~~~~~~~~~
-      //get all the days
+      //get all the days when the page load 
       $.ajax({
         method: 'GET',
         url: '/api/days'
