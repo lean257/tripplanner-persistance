@@ -20,7 +20,7 @@ var tripModule = (function () {
   // application state
 
   var days = [],
-      currentDay;
+    currentDay;
 
   // jQuery selections
 
@@ -32,14 +32,14 @@ var tripModule = (function () {
 
   // method used both internally and externally
 
-  function switchTo (newCurrentDay) {
+  function switchTo(newCurrentDay) {
     if (currentDay) currentDay.hide();
     currentDay = newCurrentDay;
     currentDay.show();
   }
 
- // ~~~~~~~~~~~~~~~~~~~~~~~
-    // before calling `addDay` or `deleteCurrentDay` that update the frontend (the UI), we need to make sure that it happened successfully on the server
+  // ~~~~~~~~~~~~~~~~~~~~~~~
+  // before calling `addDay` or `deleteCurrentDay` that update the frontend (the UI), we need to make sure that it happened successfully on the server
   // ~~~~~~~~~~~~~~~~~~~~~~~
   $(function () {
     $addButton.on('click', () => {
@@ -50,18 +50,19 @@ var tripModule = (function () {
           number: days.length + 1
         }
       })
-      .then(newDay => addDay(newDay))
-      .catch(console.error)
+        .then(newDay => addDay(newDay))
+        .catch(console.error)
     });
+    // $addButton.on('click', addDay);
     $removeButton.on('click', deleteCurrentDay);
   });
 
 
 
   // ~~~~~~~~~~~~~~~~~~~~~~~
-    // `addDay` may need to take information now that we can persist days -- we want to display what is being sent from the DB
+  // `addDay` may need to take information now that we can persist days -- we want to display what is being sent from the DB
   // ~~~~~~~~~~~~~~~~~~~~~~~
-  function addDay (dayItems) {
+  function addDay(dayItems) {
     if (this && this.blur) this.blur(); // removes focus box from buttons
     //call dayModule from day.js
     var newDay = dayModule.create(dayItems); // dayModule
@@ -73,9 +74,9 @@ var tripModule = (function () {
   }
 
   // ~~~~~~~~~~~~~~~~~~~~~~~
-    // Do not delete a day until it has already been deleted from the DB
+  // Do not delete a day until it has already been deleted from the DB
   // ~~~~~~~~~~~~~~~~~~~~~~~
-  function deleteCurrentDay () {
+  function deleteCurrentDay() {
     // prevent deleting last day
     if (days.length < 2 || !currentDay) return;
     // remove from the collection
@@ -97,15 +98,40 @@ var tripModule = (function () {
     load: function () {
 
       // ~~~~~~~~~~~~~~~~~~~~~~~
-        //If we are trying to load existing Days, then let's make a request to the server for the day. Remember this is async. For each day we get back what do we need to do to it?
+      //If we are trying to load existing Days, then let's make a request to the server for the day. Remember this is async. For each day we get back what do we need to do to it?
       // ~~~~~~~~~~~~~~~~~~~~~~~
+      // $.ajax({
+      //   method: 'GET',
+      //   url: '/api/days'
+      // })
+      //   .then(function (data) { console.log('GET response data: ', data) })
+      //   .catch(console.error.bind(console));
+      // // should log "GET response data: You GOT all the days"
+      // $.ajax({
+      //   method: 'POST',
+      //   url: '/api/days'
+      // })
+      //   .then(function (data) { console.log('POST response data: ', data) })
+      //   .catch(console.error.bind(console));
+
+
+      // should log "POST response data: You created a day!!"
       $.ajax({
         method: 'GET',
         url: '/api/days'
       })
-      .then(newDay => {
-        newDay.forEach(addDay)
-        switchTo(days[0])
+      .then(allDays => {
+        if(!allDays) {
+          $.ajax({
+            method:'POST',
+            url: 'api/days',
+            data: {
+              number: 1
+            }
+          })
+        }
+        allDays.forEach(addDay)
+        // switchTo(days[0])
       })
       .catch(console.error.bind(console));
       // $(addDay);

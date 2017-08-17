@@ -108,7 +108,7 @@ var dayModule = (function () {
         //this is a promise
         addItemsToDay = $.ajax({
           method: 'PUT',
-          url: `api/days/${this.id}/hotel`,
+          url: `api/days/${this.id}/hotels`,
           data: {
             hotelId: attraction.id
           }
@@ -116,9 +116,23 @@ var dayModule = (function () {
         break;
       case 'restaurant':
         utilsModule.pushUnique(this.restaurants, attraction);
+        addItemsToDay = $.ajax({
+          method: 'PUT',
+          url: `api/days/${this.id}/restaurants`,
+          data: {
+            restaurantId: attraction.id
+          }
+        });
         break;
       case 'activity':
         utilsModule.pushUnique(this.activities, attraction);
+        addItemsToDay = $.ajax({
+          method: 'PUT',
+          url: `api/days/${this.id}/activities`,
+          data: {
+            activityId: attraction.id
+          }
+        });
         break;
       default: console.error('bad type:', attraction);
     }

@@ -27,7 +27,6 @@ router.get('/api/options', (req, res, next) => {
   ])
   .then(response => {
     //response[0] is hotel
-    console.log(response[0])
     res.send(response)
   })
   .catch(next)
